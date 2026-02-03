@@ -158,7 +158,7 @@
 let lang = "jp";
 let discountRate = 0.95; // ✅ 기본값 LINE05
 
-const LINE_LINK = "https://lin.ee/I1pp9h7";
+const LINE_OA_ID = "@886xhwox"; // ✅ 너의 LINE公式アカウントID
 
 const couponRules = {
   NONE: {
@@ -382,13 +382,22 @@ function applyCoupon(){
 }
 
 async function goLine(){
-  // ✅ 주문 메시지 복사 후, 내 LINE 링크로 이동
   const msg = buildMessage();
+
+  // (선택) 일단 복사도 유지하고 싶으면 남겨둬도 됨
   await copyToClipboard(msg);
 
-  window.open(LINE_LINK, "_blank");
+  // ✅ OA 채팅창 열기 + 메시지 입력칸에 자동 세팅
+  const url =
+    "https://line.me/R/oaMessage/" +
+    encodeURIComponent(LINE_OA_ID) +
+    "/?" +
+    encodeURIComponent(msg);
+
+  window.open(url, "_blank");
   showCopiedHint();
 }
+
 
 async function copyOnly(){
   const msg = buildMessage();
