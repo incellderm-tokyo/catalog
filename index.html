@@ -643,7 +643,6 @@ function buildMessage(){
   lines.push((lang==="jp" ? "電話番号: " : "Phone: ") + val("phone"));
   lines.push((lang==="jp" ? "メール: " : "Email: ") + val("email"));
   lines.push("");
-  lines.push(lang === "jp" ? "※ 配送料は上記の送料にて計算済みです。" : "Shipping is included in the totals above.");
 
   return lines.join("\n");
 }
