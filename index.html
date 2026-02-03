@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Product Selection</title>
+<title>Order List</title>
 <meta name="robots" content="noindex, nofollow">
 <style>
   body { font-family: sans-serif; padding: 20px; }
@@ -26,6 +26,7 @@
 
   .product { border:1px solid #ddd; padding:10px; margin-bottom:10px; display:flex; gap:10px; border-radius:12px; }
   .product img { width:100px; height:auto; border-radius:10px; object-fit:cover; background:#f2f2f2; }
+
   .cart { border-top:2px solid #000; padding-top:10px; margin-top: 18px; }
 
   .row { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
@@ -70,7 +71,7 @@
 
   footer { font-size:12px; color:#666; margin-top:30px; }
 
-  /* ✅ qty stepper */
+  /* qty stepper */
   .qtyWrap{
     display:inline-flex;
     align-items:center;
@@ -83,6 +84,7 @@
     border:1px solid #ccc;
     padding:0 10px;
     font-size:14px;
+    background:#fff;
   }
   .stepper{
     display:flex;
@@ -100,6 +102,28 @@
     font-weight:700;
   }
   .stepper button:hover{ background:#f5f5f5; }
+
+  /* shipping form */
+  .panel{
+    border:1px solid #ddd;
+    border-radius:12px;
+    padding:12px;
+    margin-top:12px;
+    background:#fafafa;
+  }
+  .fieldLabel{
+    min-width:110px;
+    font-size:13px;
+    color:#333;
+  }
+  .w140{ width:140px; }
+  .w240{ width:240px; }
+  .w320{ width:320px; }
+  .divider{
+    height:1px;
+    background:#e6e6e6;
+    margin:12px 0;
+  }
 </style>
 </head>
 <body>
@@ -118,7 +142,7 @@
   <h3 id="cartTitle">注文内容</h3>
   <ul id="cartList"></ul>
 
-  <!-- ✅ 쿠폰: dropdown -->
+  <!-- coupon -->
   <div class="row" style="margin: 10px 0;">
     <span id="couponLabel">クーポン:</span>
     <select id="couponSelect" onchange="applyCoupon()">
@@ -128,25 +152,95 @@
     </select>
   </div>
 
-  <!-- ✅ 쿠폰 안내 문구 -->
   <div class="note" id="welcomeNote">※ 初回購入の場合は「WELCOME10」を選択してください。</div>
 
-  <!-- ✅ 소계 / 할인 / 합계 표시 -->
+  <!-- summary -->
   <div class="summary">
     <div><span id="subtotalLabel">小計</span>: <strong id="subtotalText">¥0</strong></div>
     <div><span id="discountLabel">割引</span>: <strong id="discountText">-¥0</strong></div>
-    <div style="margin-top:6px;"><span id="totalLabel">合計金額</span>: <strong id="totalText">¥0</strong></div>
+    <div><span id="totalLabel">商品合計</span>: <strong id="totalText">¥0</strong></div>
+
+    <div style="margin-top:6px;">
+      <span id="shippingFeeLabel">送料</span>: <strong id="shippingFeeText">住所入力後に表示</strong>
+    </div>
+
+    <div style="margin-top:6px; font-size:18px;">
+      <span id="grandTotalLabel">お支払い合計</span>: <strong id="grandTotalText">—</strong>
+    </div>
   </div>
 
   <div class="note" id="shippingNote">※ 配送料は別途計算されます。</div>
 
+  <!-- ONLY one button visible initially -->
   <div style="margin-top: 14px;" class="row">
-    <button class="btn" onclick="goLine()" id="lineBtn">LINEで相談する</button>
-    <button class="btn secondary" onclick="copyOnly()" id="copyBtn">内容をコピー</button>
+    <button class="btn secondary" onclick="toggleShippingForm()" id="shipToggleBtn">お届け先を入力</button>
   </div>
 
-  <div class="note" id="copyHint" style="display:none;">
-    コピーしました。LINEのトークに貼り付けて送信してください。
+  <!-- shipping form (collapsed) -->
+  <div id="shippingForm" class="panel" style="display:none;">
+    <div class="row">
+      <strong id="shipTitle">お届け先情報</strong>
+      <span class="note" id="shipHint" style="margin:0;">（送料計算のため、都道府県まで入力してください）</span>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="row" style="margin-bottom:8px;">
+      <span class="fieldLabel" id="zipLabel">郵便番号</span>
+      <input id="zip" class="qtyInput w140" placeholder="例: 123-4567" inputmode="numeric" autocomplete="postal-code">
+      <button class="btn secondary" type="button" onclick="lookupZip()" id="zipSearchBtn">検索</button>
+    </div>
+
+    <div class="row" style="margin-bottom:8px;">
+      <span class="fieldLabel" id="prefLabel">都道府県</span>
+      <input id="pref" class="qtyInput w240" placeholder="自動入力 / 手入力OK" autocomplete="address-level1">
+    </div>
+
+    <div class="row" style="margin-bottom:8px;">
+      <span class="fieldLabel" id="cityLabel">市区町村</span>
+      <input id="city" class="qtyInput w240" placeholder="自動入力" autocomplete="address-level2">
+    </div>
+
+    <div class="row" style="margin-bottom:8px;">
+      <span class="fieldLabel" id="townLabel">町域</span>
+      <input id="town" class="qtyInput w240" placeholder="自動入力">
+    </div>
+
+    <div class="row" style="margin-bottom:8px;">
+      <span class="fieldLabel" id="addr2Label">番地・建物名</span>
+      <input id="addr2" class="qtyInput w320" placeholder="例: 1-2-3 ○○マンション101" autocomplete="address-line1">
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="row" style="margin-bottom:8px;">
+      <span class="fieldLabel" id="nameLabel">お名前</span>
+      <input id="custName" class="qtyInput w240" placeholder="例: 山田 太郎" autocomplete="name">
+    </div>
+
+    <div class="row" style="margin-bottom:8px;">
+      <span class="fieldLabel" id="phoneLabel">電話番号</span>
+      <input id="phone" class="qtyInput w240" placeholder="例: 090-1234-5678" inputmode="tel" autocomplete="tel">
+    </div>
+
+    <div class="row" style="margin-bottom:8px;">
+      <span class="fieldLabel" id="emailLabel">メール</span>
+      <input id="email" class="qtyInput w320" placeholder="例: example@mail.com" inputmode="email" autocomplete="email">
+    </div>
+
+    <div class="note" id="privacyNote" style="margin-top:10px;">
+      ※ ご入力いただいた個人情報は発送業務のみに使用し、第三者に提供することはありません。
+    </div>
+
+    <!-- Buttons moved UNDER shipping form -->
+    <div style="margin-top: 14px;" class="row">
+      <button class="btn" onclick="goLine()" id="lineBtn">注文内容をLINEで送信</button>
+      <button class="btn secondary" onclick="copyOnly()" id="copyBtn">内容をコピー</button>
+    </div>
+
+    <div class="note" id="copyHint" style="display:none;">
+      コピーしました。LINEのトークに貼り付けて送信してください。
+    </div>
   </div>
 </div>
 
@@ -156,9 +250,11 @@
 
 <script>
 let lang = "jp";
-let discountRate = 0.95; // ✅ 기본값 LINE05
 
-const LINE_OA_ID = "@886xhwox"; // ✅ 너의 LINE公式アカウントID
+// LINE Official Account ID (from your lin.ee link)
+const LINE_OA_ID = "@886xhwox";
+
+let discountRate = 0.95; // display use
 
 const couponRules = {
   NONE: {
@@ -210,32 +306,68 @@ const text = {
     desc: "ご希望の商品と数量を選択してください。",
     cart: "注文内容",
     couponLabel: "クーポン:",
-    welcome: "※ 初回購入の場合は「WELCOME10」を選択してください。",
     subtotal: "小計",
     discount: "割引",
-    total: "合計金額",
-    lineBtn: "LINEで相談する",
-    copyBtn: "内容をコピー",
-    qtyLabel: "数量",
+    totalGoods: "商品合計",
+    shippingFee: "送料",
+    grandTotal: "お支払い合計",
     shipNote: "※ 配送料は別途計算されます。",
     footer: "本ページは参考用のリストです。オンライン注文・決済は行っておりません。",
-    copiedHint: "コピーしました。LINEのトークに貼り付けて送信してください。"
+    copiedHint: "コピーしました。LINEのトークに貼り付けて送信してください。",
+    shipToggle: "お届け先を入力",
+    shipTitle: "お届け先情報",
+    shipHint: "（送料計算のため、都道府県まで入力してください）",
+    zipLabel: "郵便番号",
+    zipSearch: "検索",
+    prefLabel: "都道府県",
+    cityLabel: "市区町村",
+    townLabel: "町域",
+    addr2Label: "番地・建物名",
+    nameLabel: "お名前",
+    phoneLabel: "電話番号",
+    emailLabel: "メール",
+    privacy: "※ ご入力いただいた個人情報は発送業務のみに使用し、第三者に提供することはありません。",
+    lineBtn: "注文内容をLINEで送信",
+    copyBtn: "内容をコピー",
+    qtyLabel: "数量",
+    showShipAfter: "住所入力後に表示",
+    missingPref: "都道府県を入力してください（送料計算のため）。",
+    missingCustomer: "ご注文のため、お名前・ご住所・お電話番号・メールアドレスをご入力ください。",
+    noItems: "商品が未選択です。数量を入力してください。"
   },
   en: {
     title: "Order List",
     desc: "Select products and quantities.",
     cart: "Order Summary",
     couponLabel: "Coupon:",
-    welcome: "If this is your first purchase, choose WELCOME10.",
     subtotal: "Subtotal",
     discount: "Discount",
-    total: "Total",
-    lineBtn: "Chat on LINE",
-    copyBtn: "Copy details",
-    qtyLabel: "Qty",
+    totalGoods: "Goods total",
+    shippingFee: "Shipping",
+    grandTotal: "Grand total",
     shipNote: "Shipping fee will be calculated separately.",
     footer: "This page is for reference only. No online ordering or payment is processed here.",
-    copiedHint: "Copied. Paste it into LINE chat and send."
+    copiedHint: "Copied. Paste it into LINE chat and send.",
+    shipToggle: "Enter shipping address",
+    shipTitle: "Shipping details",
+    shipHint: "(We need at least your prefecture to calculate shipping.)",
+    zipLabel: "Postal code",
+    zipSearch: "Search",
+    prefLabel: "Prefecture",
+    cityLabel: "City",
+    townLabel: "Town",
+    addr2Label: "Street / Building",
+    nameLabel: "Name",
+    phoneLabel: "Phone",
+    emailLabel: "Email",
+    privacy: "We use your personal information only for shipping and contact, and do not share it with third parties.",
+    lineBtn: "Send order to LINE",
+    copyBtn: "Copy details",
+    qtyLabel: "Qty",
+    showShipAfter: "Enter address to calculate",
+    missingPref: "Please enter your prefecture (needed to calculate shipping).",
+    missingCustomer: "Please enter your name, address, phone, and email to place an order.",
+    noItems: "No items selected. Please set quantities."
   }
 };
 
@@ -243,27 +375,59 @@ let cart = {}; // code -> qty
 
 function setLang(l){
   lang = l;
+
   document.getElementById("title").innerText = text[l].title;
   document.getElementById("desc").innerText = text[l].desc;
   document.getElementById("cartTitle").innerText = text[l].cart;
 
   document.getElementById("couponLabel").innerText = text[l].couponLabel;
-  // 기본 웰컴 안내(쿠폰에 따라 applyCoupon에서 다시 덮어씀)
-  document.getElementById("welcomeNote").innerText = text[l].welcome;
 
   document.getElementById("subtotalLabel").innerText = text[l].subtotal;
   document.getElementById("discountLabel").innerText = text[l].discount;
-  document.getElementById("totalLabel").innerText = text[l].total;
+  document.getElementById("totalLabel").innerText = text[l].totalGoods;
+  document.getElementById("shippingFeeLabel").innerText = text[l].shippingFee;
+  document.getElementById("grandTotalLabel").innerText = text[l].grandTotal;
 
-  document.getElementById("lineBtn").innerText = text[l].lineBtn;
-  document.getElementById("copyBtn").innerText = text[l].copyBtn;
   document.getElementById("shippingNote").innerText = text[l].shipNote;
   document.getElementById("footerText").innerText = text[l].footer;
 
+  document.getElementById("shipToggleBtn").innerText = text[l].shipToggle;
+  document.getElementById("shipTitle").innerText = text[l].shipTitle;
+  document.getElementById("shipHint").innerText = text[l].shipHint;
+
+  document.getElementById("zipLabel").innerText = text[l].zipLabel;
+  document.getElementById("zipSearchBtn").innerText = text[l].zipSearch;
+
+  document.getElementById("prefLabel").innerText = text[l].prefLabel;
+  document.getElementById("cityLabel").innerText = text[l].cityLabel;
+  document.getElementById("townLabel").innerText = text[l].townLabel;
+  document.getElementById("addr2Label").innerText = text[l].addr2Label;
+
+  document.getElementById("nameLabel").innerText = text[l].nameLabel;
+  document.getElementById("phoneLabel").innerText = text[l].phoneLabel;
+  document.getElementById("emailLabel").innerText = text[l].emailLabel;
+
+  document.getElementById("privacyNote").innerText = text[l].privacy;
+
+  document.getElementById("lineBtn").innerText = text[l].lineBtn;
+  document.getElementById("copyBtn").innerText = text[l].copyBtn;
+
   render();
-  applyCoupon(); // ✅ 쿠폰 문구를 현재 언어로 갱신
+  applyCoupon();
+  updateShippingAndGrandTotal();
 }
 
+function toggleShippingForm(){
+  const form = document.getElementById("shippingForm");
+  const isOpen = form.style.display !== "none";
+  form.style.display = isOpen ? "none" : "block";
+  if (!isOpen) {
+    // focus zip for quick input
+    setTimeout(()=>document.getElementById("zip")?.focus(), 50);
+  }
+}
+
+// ---------- Render Products ----------
 function render(){
   const div = document.getElementById("products");
   div.innerHTML = "";
@@ -314,6 +478,7 @@ function stepQty(code, delta){
   updateQty(code, next);
 }
 
+// ---------- Money ----------
 function getSubtotal(){
   let subtotal = 0;
   for (let c in cart){
@@ -324,7 +489,7 @@ function getSubtotal(){
   return subtotal;
 }
 
-function getTotal(){
+function getTotalGoodsAfterCoupon(){
   const subtotal = getSubtotal();
   const v = document.getElementById("couponSelect")?.value || "NONE";
   const rule = couponRules[v] || couponRules.NONE;
@@ -335,6 +500,52 @@ function getTotal(){
   return Math.max(0, subtotal - cappedOff);
 }
 
+function getPrefValue(){
+  const el = document.getElementById("pref");
+  return el ? el.value : "";
+}
+
+function getShippingFeeByPref(pref){
+  const p = String(pref || "").trim();
+  if (!p) return null;
+
+  const FEES = [
+    { fee: 1500, prefs: ["北海道"] },
+    { fee: 1100, prefs: ["青森県","岩手県","宮城県","秋田県","山形県","福島県"] },
+    { fee: 1000, prefs: ["茨城県","栃木県","群馬県","埼玉県","千葉県","東京都","神奈川県","山梨県"] },
+    { fee: 1000, prefs: ["新潟県","長野県"] },
+    { fee: 1000, prefs: ["富山県","石川県","福井県"] },
+    { fee: 1000, prefs: ["岐阜県","静岡県","愛知県","三重県"] },
+    { fee: 1100, prefs: ["滋賀県","京都府","大阪府","兵庫県","奈良県","和歌山県"] },
+    { fee: 1200, prefs: ["鳥取県","島根県","岡山県","広島県","山口県"] },
+    { fee: 1200, prefs: ["徳島県","香川県","愛媛県","高知県"] },
+    { fee: 1500, prefs: ["福岡県","佐賀県","長崎県","熊本県","大分県","宮崎県","鹿児島県"] },
+    { fee: 1500, prefs: ["沖縄県","沖縄"] },
+  ];
+
+  for (const g of FEES){
+    if (g.prefs.includes(p)) return g.fee;
+  }
+  return null;
+}
+
+function updateShippingAndGrandTotal(){
+  const goodsTotal = getTotalGoodsAfterCoupon();
+  const ship = getShippingFeeByPref(getPrefValue());
+
+  const shipTextEl = document.getElementById("shippingFeeText");
+  const grandEl = document.getElementById("grandTotalText");
+
+  if (ship == null){
+    shipTextEl.innerText = text[lang].showShipAfter;
+    grandEl.innerText = "—";
+  } else {
+    shipTextEl.innerText = "¥" + ship.toLocaleString();
+    grandEl.innerText = "¥" + (goodsTotal + ship).toLocaleString();
+  }
+}
+
+// ---------- Cart ----------
 function renderCart(){
   const ul = document.getElementById("cartList");
   ul.innerHTML = "";
@@ -353,18 +564,20 @@ function renderCart(){
   });
 
   const subtotal = getSubtotal();
-  const total = getTotal();
-  const discountAmt = Math.max(0, subtotal - total);
+  const totalGoods = getTotalGoodsAfterCoupon();
+  const discountAmt = Math.max(0, subtotal - totalGoods);
 
   document.getElementById("subtotalText").innerText = "¥" + subtotal.toLocaleString();
   document.getElementById("discountText").innerText = "-¥" + discountAmt.toLocaleString();
-  document.getElementById("totalText").innerText = "¥" + total.toLocaleString();
+  document.getElementById("totalText").innerText = "¥" + totalGoods.toLocaleString();
+
+  updateShippingAndGrandTotal();
 }
 
+// ---------- Coupon ----------
 function applyCoupon(){
   const v = document.getElementById("couponSelect").value;
   const rule = couponRules[v] || couponRules.NONE;
-
   discountRate = rule.rate;
 
   const noteEl = document.getElementById("welcomeNote");
@@ -381,13 +594,111 @@ function applyCoupon(){
   renderCart();
 }
 
-async function goLine(){
-  const msg = buildMessage();
+// ---------- Zip Lookup (ZipCloud) ----------
+function normalizeZip(z){
+  return String(z || "").replace(/[^\d]/g, "").slice(0, 7);
+}
 
-  // (선택) 일단 복사도 유지하고 싶으면 남겨둬도 됨
+async function lookupZip(){
+  const zip = normalizeZip(document.getElementById("zip").value);
+  if (zip.length !== 7){
+    alert(lang === "jp" ? "郵便番号は7桁で入力してください。" : "Please enter a 7-digit postal code.");
+    return;
+  }
+
+  // ZipCloud API
+  const url = "https://zipcloud.ibsnet.co.jp/api/search?zipcode=" + zip;
+
+  try{
+    const res = await fetch(url);
+    const data = await res.json();
+
+    if (!data || data.status !== 200 || !data.results || !data.results[0]){
+      alert(lang === "jp" ? "住所が見つかりませんでした。" : "Address not found.");
+      return;
+    }
+
+    const r = data.results[0];
+    document.getElementById("pref").value = r.address1 || "";
+    document.getElementById("city").value = r.address2 || "";
+    document.getElementById("town").value = r.address3 || "";
+
+    updateShippingAndGrandTotal();
+  } catch(e){
+    alert(lang === "jp"
+      ? "住所検索に失敗しました。通信環境をご確認ください。"
+      : "Failed to lookup address. Please check your network.");
+  }
+}
+
+// Format zip input and auto-lookup when 7 digits
+document.addEventListener("input", (e) => {
+  if (e.target && e.target.id === "zip"){
+    const raw = normalizeZip(e.target.value);
+    e.target.value = raw.length > 3 ? raw.slice(0,3) + "-" + raw.slice(3) : raw;
+    if (raw.length === 7) lookupZip();
+  }
+  if (e.target && e.target.id === "pref"){
+    updateShippingAndGrandTotal();
+  }
+});
+
+// ---------- Validation ----------
+function hasAnyItems(){
+  return Object.keys(cart).length > 0;
+}
+
+function validateForOrder(){
+  if (!hasAnyItems()){
+    alert(text[lang].noItems);
+    return false;
+  }
+
+  const pref = getPrefValue().trim();
+  const ship = getShippingFeeByPref(pref);
+  if (!pref || ship == null){
+    alert(text[lang].missingPref);
+    document.getElementById("pref")?.focus();
+    return false;
+  }
+
+  // Require customer info for ordering
+  const name = (document.getElementById("custName").value || "").trim();
+  const zip = normalizeZip(document.getElementById("zip").value);
+  const city = (document.getElementById("city").value || "").trim();
+  const town = (document.getElementById("town").value || "").trim();
+  const addr2 = (document.getElementById("addr2").value || "").trim();
+  const phone = (document.getElementById("phone").value || "").trim();
+  const email = (document.getElementById("email").value || "").trim();
+
+  const hasAddress = zip.length === 7 && pref && (city || town || addr2);
+
+  if (!name || !hasAddress || !phone || !email){
+    alert(text[lang].missingCustomer);
+    // focus the first missing field
+    if (!name) document.getElementById("custName")?.focus();
+    else if (zip.length !== 7) document.getElementById("zip")?.focus();
+    else if (!pref) document.getElementById("pref")?.focus();
+    else if (!phone) document.getElementById("phone")?.focus();
+    else document.getElementById("email")?.focus();
+    return false;
+  }
+
+  return true;
+}
+
+// ---------- LINE / Copy ----------
+async function goLine(){
+  // Ensure the shipping form is visible so users notice what to fill
+  const form = document.getElementById("shippingForm");
+  if (form.style.display === "none") form.style.display = "block";
+
+  if (!validateForOrder()) return;
+
+  const msg = buildMessage();
   await copyToClipboard(msg);
 
-  // ✅ OA 채팅창 열기 + 메시지 입력칸에 자동 세팅
+  // Open OA chat + prefill message (user taps Send)
   const url =
     "https://line.me/R/oaMessage/" +
     encodeURIComponent(LINE_OA_ID) +
@@ -398,8 +709,12 @@ async function goLine(){
   showCopiedHint();
 }
 
-
 async function copyOnly(){
+  const form = document.getElementById("shippingForm");
+  if (form.style.display === "none") form.style.display = "block";
+
+  if (!validateForOrder()) return;
+
   const msg = buildMessage();
   await copyToClipboard(msg);
   showCopiedHint();
@@ -416,11 +731,8 @@ function buildMessage(){
 
   const lines = [];
   lines.push(lang === "jp" ? "【ご注文内容】" : "[Order Request]");
-  if (items.length === 0) {
-    lines.push(lang === "jp" ? "(未選択)" : "(none selected)");
-  } else {
-    items.forEach(it => lines.push(`${it.no}. ${it.name} × ${it.qty}`));
-  }
+
+  items.forEach(it => lines.push(`${it.no}. ${it.name} × ${it.qty}`));
 
   const coupon = document.getElementById("couponSelect").value;
   if (coupon !== "NONE") {
@@ -428,13 +740,37 @@ function buildMessage(){
   }
 
   const subtotal = getSubtotal();
-  const total = getTotal();
-  const discountAmt = Math.max(0, subtotal - total);
-
+  const totalGoods = getTotalGoodsAfterCoupon();
+  const discountAmt = Math.max(0, subtotal - totalGoods);
   lines.push((lang==="jp" ? "小計: ¥" : "Subtotal: ¥") + subtotal.toLocaleString());
   lines.push((lang==="jp" ? "割引: -¥" : "Discount: -¥") + discountAmt.toLocaleString());
-  lines.push((lang==="jp" ? "合計金額: ¥" : "Total: ¥") + total.toLocaleString());
-  lines.push(lang === "jp" ? "※ 配送料は別途計算されます。" : "Shipping fee will be calculated separately.");
+  lines.push((lang==="jp" ? "商品合計: ¥" : "Goods total: ¥") + totalGoods.toLocaleString());
+
+  const pref = getPrefValue().trim();
+  const ship = getShippingFeeByPref(pref);
+  if (ship != null){
+    lines.push((lang==="jp" ? "送料: ¥" : "Shipping: ¥") + ship.toLocaleString());
+    lines.push((lang==="jp" ? "お支払い合計: ¥" : "Grand Total: ¥") + (totalGoods + ship).toLocaleString());
+  }
+
+  // Customer info
+  const zip = (document.getElementById("zip").value || "").trim();
+  const city = (document.getElementById("city").value || "").trim();
+  const town = (document.getElementById("town").value || "").trim();
+  const addr2 = (document.getElementById("addr2").value || "").trim();
+  const name = (document.getElementById("custName").value || "").trim();
+  const phone = (document.getElementById("phone").value || "").trim();
+  const email = (document.getElementById("email").value || "").trim();
+
+  lines.push("");
+  lines.push(lang === "jp" ? "【お客様情報】" : "[Customer Info]");
+  lines.push((lang==="jp" ? "お名前: " : "Name: ") + name);
+  lines.push((lang==="jp" ? "ご住所: " : "Address: ") + `〒${zip} ${pref} ${city}${town} ${addr2}`.trim());
+  lines.push((lang==="jp" ? "電話番号: " : "Phone: ") + phone);
+  lines.push((lang==="jp" ? "メール: " : "Email: ") + email);
+
+  lines.push("");
+  lines.push(lang === "jp" ? "※ 配送料は上記の送料にて計算済みです。" : "Shipping is included in the totals above.");
 
   return lines.join("\n");
 }
@@ -468,7 +804,7 @@ function escapeHtml(s){
     .replaceAll("'", "&#039;");
 }
 
-// ✅ 초기: JP + LINE05 적용
+// Init
 setLang("jp");
 applyCoupon();
 </script>
