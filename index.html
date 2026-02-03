@@ -27,7 +27,6 @@
   .product { border:1px solid #ddd; padding:10px; margin-bottom:10px; display:flex; gap:10px; border-radius:12px; }
   .product img { width:100px; height:auto; border-radius:10px; object-fit:cover; background:#f2f2f2; }
   .cart { border-top:2px solid #000; padding-top:10px; margin-top: 18px; }
-  input[type=number]{ width:72px; }
 
   .row { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
   .btn {
@@ -70,6 +69,37 @@
   }
 
   footer { font-size:12px; color:#666; margin-top:30px; }
+
+  /* ✅ qty stepper */
+  .qtyWrap{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+  }
+  .qtyInput{
+    width:72px;
+    height:38px;
+    border-radius:10px;
+    border:1px solid #ccc;
+    padding:0 10px;
+    font-size:14px;
+  }
+  .stepper{
+    display:flex;
+    flex-direction:column;
+    gap:4px;
+  }
+  .stepper button{
+    width:34px;
+    height:17px;
+    border-radius:6px;
+    border:1px solid #ccc;
+    background:#fff;
+    cursor:pointer;
+    line-height:1;
+    font-weight:700;
+  }
+  .stepper button:hover{ background:#f5f5f5; }
 </style>
 </head>
 <body>
@@ -88,7 +118,7 @@
   <h3 id="cartTitle">注文内容</h3>
   <ul id="cartList"></ul>
 
-  <!-- ✅ 쿠폰: input -> dropdown -->
+  <!-- ✅ 쿠폰: dropdown -->
   <div class="row" style="margin: 10px 0;">
     <span id="couponLabel">クーポン:</span>
     <select id="couponSelect" onchange="applyCoupon()">
@@ -98,7 +128,7 @@
     </select>
   </div>
 
-  <!-- ✅ 첫구매 안내 문구 -->
+  <!-- ✅ 쿠폰 안내 문구 -->
   <div class="note" id="welcomeNote">※ 初回購入の場合は「WELCOME10」を選択してください。</div>
 
   <!-- ✅ 소계 / 할인 / 합계 표시 -->
@@ -127,6 +157,9 @@
 <script>
 let lang = "jp";
 let discountRate = 0.95; // ✅ 기본값 LINE05
+
+const LINE_LINK = "https://lin.ee/I1pp9h7";
+
 const couponRules = {
   NONE: {
     rate: 1.00,
@@ -151,8 +184,6 @@ const couponRules = {
   }
 };
 
-
-
 const products = [
   { no: 1,  code:"01", name:{ en:"DERMATOLOGY SKIN CARE SET", ja:"ダーマトロジー スキンケアセット" }, price:24200, img:"images/01.jpg" },
   { no: 2,  code:"02", name:{ en:"DUAL CREAM RECOVERY SET", ja:"デュアルクリームリカバリーセット" }, price:33900, img:"images/02.jpg" },
@@ -175,9 +206,9 @@ const products = [
 
 const text = {
   jp: {
-    title: "商品構成選択",
+    title: "注文商品選択",
     desc: "ご希望の商品と数量を選択してください。",
-    cart: "選択内容",
+    cart: "注文内容",
     couponLabel: "クーポン:",
     welcome: "※ 初回購入の場合は「WELCOME10」を選択してください。",
     subtotal: "小計",
@@ -193,7 +224,7 @@ const text = {
   en: {
     title: "Order List",
     desc: "Select products and quantities.",
-    cart: "Selected Items",
+    cart: "Order Summary",
     couponLabel: "Coupon:",
     welcome: "If this is your first purchase, choose WELCOME10.",
     subtotal: "Subtotal",
@@ -217,6 +248,7 @@ function setLang(l){
   document.getElementById("cartTitle").innerText = text[l].cart;
 
   document.getElementById("couponLabel").innerText = text[l].couponLabel;
+  // 기본 웰컴 안내(쿠폰에 따라 applyCoupon에서 다시 덮어씀)
   document.getElementById("welcomeNote").innerText = text[l].welcome;
 
   document.getElementById("subtotalLabel").innerText = text[l].subtotal;
@@ -229,8 +261,7 @@ function setLang(l){
   document.getElementById("footerText").innerText = text[l].footer;
 
   render();
-  applyCoupon(); // ✅ 현재 선택된 쿠폰 문구를 새 언어로 갱신
-
+  applyCoupon(); // ✅ 쿠폰 문구를 현재 언어로 갱신
 }
 
 function render(){
@@ -245,12 +276,18 @@ function render(){
         <img src="${p.img}" alt="${escapeHtml(p.name[lang==='jp'?'ja':'en'])}"
              onerror="this.style.opacity=.2; this.alt='(no image)';">
         <div>
-          <strong>${p.no}. ${p.name[lang==='jp'?'ja':'en']}</strong><br>
+          <strong>${p.no}. ${escapeHtml(p.name[lang==='jp'?'ja':'en'])}</strong><br>
           <span style="opacity:.8;">¥${p.price.toLocaleString()}</span><br><br>
 
           ${text[lang].qtyLabel}:
-          <input type="number" min="0" max="20" value="${qty}"
-            onchange="updateQty('${p.code}', this.value)">
+          <span class="qtyWrap">
+            <input class="qtyInput" id="qty_${p.code}" type="number" min="0" max="20" value="${qty}"
+              onchange="updateQty('${p.code}', this.value)">
+            <span class="stepper">
+              <button type="button" onclick="stepQty('${p.code}', 1)">▲</button>
+              <button type="button" onclick="stepQty('${p.code}', -1)">▼</button>
+            </span>
+          </span>
         </div>
       </div>
     `;
@@ -264,6 +301,17 @@ function updateQty(code, val){
   if (n === 0) delete cart[code];
   else cart[code] = n;
   renderCart();
+}
+
+function stepQty(code, delta){
+  const el = document.getElementById("qty_" + code);
+  if (!el) return;
+
+  const cur = parseInt(el.value || "0", 10) || 0;
+  const next = Math.max(0, Math.min(20, cur + delta));
+
+  el.value = next;
+  updateQty(code, next);
 }
 
 function getSubtotal(){
@@ -313,15 +361,12 @@ function renderCart(){
   document.getElementById("totalText").innerText = "¥" + total.toLocaleString();
 }
 
-// ✅ 드롭다운 값에 따라 할인율 변경
 function applyCoupon(){
   const v = document.getElementById("couponSelect").value;
   const rule = couponRules[v] || couponRules.NONE;
 
-  // 할인율 저장(표시용)
   discountRate = rule.rate;
 
-  // ✅ 쿠폰별 문구 자동 표시
   const noteEl = document.getElementById("welcomeNote");
   const msg = rule.note[lang === "jp" ? "jp" : "en"];
 
@@ -336,12 +381,12 @@ function applyCoupon(){
   renderCart();
 }
 
-
 async function goLine(){
+  // ✅ 주문 메시지 복사 후, 내 LINE 링크로 이동
   const msg = buildMessage();
   await copyToClipboard(msg);
-  const url = "https://line.me/R/msg/text/?" + encodeURIComponent(msg);
-  window.open(url, "_blank");
+
+  window.open(LINE_LINK, "_blank");
   showCopiedHint();
 }
 
@@ -361,7 +406,7 @@ function buildMessage(){
   items.sort((a,b)=>a.no-b.no);
 
   const lines = [];
-  lines.push(lang === "jp" ? "【ご希望内容】" : "[Request]");
+  lines.push(lang === "jp" ? "【ご注文内容】" : "[Order Request]");
   if (items.length === 0) {
     lines.push(lang === "jp" ? "(未選択)" : "(none selected)");
   } else {
