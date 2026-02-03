@@ -9,18 +9,10 @@
 
   .lang { display:flex; gap:8px; margin-bottom: 10px; }
   .lang button {
-    display:inline-flex;
-    align-items:center;
-    justify-content:center;
-    width:110px;
-    height:38px;
-    padding:0 12px;
-    border-radius:10px;
-    font-weight:600;
-    line-height:1;
-    border:1px solid #ccc;
-    background:#fff;
-    cursor:pointer;
+    display:inline-flex; align-items:center; justify-content:center;
+    width:110px; height:38px; padding:0 12px;
+    border-radius:10px; font-weight:600; line-height:1;
+    border:1px solid #ccc; background:#fff; cursor:pointer;
   }
   .lang button:hover { background:#f5f5f5; }
 
@@ -31,99 +23,44 @@
 
   .row { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
   .btn {
-    display:inline-flex;
-    align-items:center;
-    justify-content:center;
-    height:38px;
-    padding:0 14px;
-    border-radius:10px;
-    border:1px solid #111;
-    background:#111;
-    color:#fff;
-    font-weight:700;
-    cursor:pointer;
+    display:inline-flex; align-items:center; justify-content:center;
+    height:38px; padding:0 14px; border-radius:10px;
+    border:1px solid #111; background:#111; color:#fff;
+    font-weight:700; cursor:pointer;
   }
-  .btn.secondary {
-    background:#fff;
-    color:#111;
-    border:1px solid #ccc;
-    font-weight:600;
-  }
+  .btn.secondary { background:#fff; color:#111; border:1px solid #ccc; font-weight:600; }
 
-  .note {
-    margin-top: 8px;
-    font-size: 12px;
-    color: #666;
-  }
+  .note { margin-top: 8px; font-size: 12px; color: #666; }
 
   select {
-    height:38px;
-    border-radius:10px;
-    padding:0 10px;
-    border:1px solid #ccc;
-    background:#fff;
+    height:38px; border-radius:10px; padding:0 10px;
+    border:1px solid #ccc; background:#fff;
   }
 
-  .summary {
-    margin-top: 10px;
-    line-height: 1.6;
-  }
-
-  footer { font-size:12px; color:#666; margin-top:30px; }
+  .summary { margin-top: 10px; line-height: 1.6; }
 
   /* qty stepper */
-  .qtyWrap{
-    display:inline-flex;
-    align-items:center;
-    gap:6px;
-  }
+  .qtyWrap{ display:inline-flex; align-items:center; gap:6px; }
   .qtyInput{
-    width:72px;
-    height:38px;
-    border-radius:10px;
-    border:1px solid #ccc;
-    padding:0 10px;
-    font-size:14px;
-    background:#fff;
+    width:72px; height:38px; border-radius:10px; border:1px solid #ccc;
+    padding:0 10px; font-size:14px; background:#fff;
   }
-  .stepper{
-    display:flex;
-    flex-direction:column;
-    gap:4px;
-  }
+  .stepper{ display:flex; flex-direction:column; gap:4px; }
   .stepper button{
-    width:34px;
-    height:17px;
-    border-radius:6px;
-    border:1px solid #ccc;
-    background:#fff;
-    cursor:pointer;
-    line-height:1;
-    font-weight:700;
+    width:34px; height:17px; border-radius:6px;
+    border:1px solid #ccc; background:#fff; cursor:pointer;
+    line-height:1; font-weight:700;
   }
   .stepper button:hover{ background:#f5f5f5; }
 
   /* shipping form */
   .panel{
-    border:1px solid #ddd;
-    border-radius:12px;
-    padding:12px;
-    margin-top:12px;
-    background:#fafafa;
+    border:1px solid #ddd; border-radius:12px; padding:12px;
+    margin-top:12px; background:#fafafa;
   }
-  .fieldLabel{
-    min-width:110px;
-    font-size:13px;
-    color:#333;
-  }
-  .w140{ width:140px; }
-  .w240{ width:240px; }
-  .w320{ width:320px; }
-  .divider{
-    height:1px;
-    background:#e6e6e6;
-    margin:12px 0;
-  }
+  .fieldLabel{ min-width:110px; font-size:13px; color:#333; }
+  .w140{ width:140px; } .w240{ width:240px; } .w320{ width:320px; }
+  .divider{ height:1px; background:#e6e6e6; margin:12px 0; }
 </style>
 </head>
 <body>
@@ -142,7 +79,6 @@
   <h3 id="cartTitle">注文内容</h3>
   <ul id="cartList"></ul>
 
-  <!-- coupon -->
   <div class="row" style="margin: 10px 0;">
     <span id="couponLabel">クーポン:</span>
     <select id="couponSelect" onchange="applyCoupon()">
@@ -154,7 +90,6 @@
 
   <div class="note" id="welcomeNote">※ 初回購入の場合は「WELCOME10」を選択してください。</div>
 
-  <!-- summary -->
   <div class="summary">
     <div><span id="subtotalLabel">小計</span>: <strong id="subtotalText">¥0</strong></div>
     <div><span id="discountLabel">割引</span>: <strong id="discountText">-¥0</strong></div>
@@ -171,12 +106,10 @@
 
   <div class="note" id="shippingNote">※ 配送料は別途計算されます。</div>
 
-  <!-- ONLY one button visible initially -->
   <div style="margin-top: 14px;" class="row">
     <button class="btn secondary" onclick="toggleShippingForm()" id="shipToggleBtn">お届け先を入力</button>
   </div>
 
-  <!-- shipping form (collapsed) -->
   <div id="shippingForm" class="panel" style="display:none;">
     <div class="row">
       <strong id="shipTitle">お届け先情報</strong>
@@ -232,7 +165,6 @@
       ※ ご入力いただいた個人情報は発送業務のみに使用し、第三者に提供することはありません。
     </div>
 
-    <!-- Buttons moved UNDER shipping form -->
     <div style="margin-top: 14px;" class="row">
       <button class="btn" onclick="goLine()" id="lineBtn">注文内容をLINEで送信</button>
       <button class="btn secondary" onclick="copyOnly()" id="copyBtn">内容をコピー</button>
@@ -244,41 +176,48 @@
   </div>
 </div>
 
-<footer id="footerText">
-本ページは参考用のリストです。オンライン注文・決済は行っておりません。
-</footer>
-
 <script>
+/* ========= helpers ========= */
+const $ = (id) => document.getElementById(id);
+const val = (id) => ($(id)?.value ?? "").trim();
+const setText = (id, t) => { const el = $(id); if (el) el.innerText = t; };
+const yen = (n) => "¥" + Number(n || 0).toLocaleString();
+const clampInt = (x, min, max) => Math.max(min, Math.min(max, parseInt(x || "0", 10) || 0));
+
+/* ========= config ========= */
 let lang = "jp";
-
-// LINE Official Account ID (from your lin.ee link)
-const LINE_OA_ID = "@886xhwox";
-
-let discountRate = 0.95; // display use
+const LINE_OA_ID = "@886xhwox"; // your OA ID
 
 const couponRules = {
-  NONE: {
-    rate: 1.00,
-    maxOff: 0,
-    note: { jp: "", en: "" }
-  },
+  NONE: { rate: 1.00, maxOff: 0, note: { jp:"", en:"" } },
   LINE05: {
-    rate: 0.95,
-    maxOff: 5000,
+    rate: 0.95, maxOff: 5000,
     note: {
       jp: "※ LINEでのご注文時にご利用いただけます（5%OFF／最大割引¥5,000）",
       en: "Available for orders placed via LINE (5% OFF / Max ¥5,000 discount)"
     }
   },
   WELCOME10: {
-    rate: 0.90,
-    maxOff: 10000,
+    rate: 0.90, maxOff: 10000,
     note: {
       jp: "※ 初回購入の場合にご利用ください（10%OFF／最大割引¥10,000）",
       en: "For first-time purchases (10% OFF / Max ¥10,000 discount)"
     }
   }
 };
+
+// Shipping: grouped to reduce duplication (many prefs share 1000 yen etc.)
+const shippingGroups = [
+  { fee: 1500, prefs: ["北海道","福岡県","佐賀県","長崎県","熊本県","大分県","宮崎県","鹿児島県","沖縄県","沖縄"] },
+  { fee: 1200, prefs: ["鳥取県","島根県","岡山県","広島県","山口県","徳島県","香川県","愛媛県","高知県"] },
+  { fee: 1100, prefs: ["青森県","岩手県","宮城県","秋田県","山形県","福島県","滋賀県","京都府","大阪府","兵庫県","奈良県","和歌山県"] },
+  { fee: 1000, prefs: ["茨城県","栃木県","群馬県","埼玉県","千葉県","東京都","神奈川県","山梨県","新潟県","長野県","富山県","石川県","福井県","岐阜県","静岡県","愛知県","三重県"] },
+];
+const shippingFeeMap = (() => {
+  const m = {};
+  shippingGroups.forEach(g => g.prefs.forEach(p => m[p] = g.fee));
+  return m;
+})();
 
 const products = [
   { no: 1,  code:"01", name:{ en:"DERMATOLOGY SKIN CARE SET", ja:"ダーマトロジー スキンケアセット" }, price:24200, img:"images/01.jpg" },
@@ -312,7 +251,6 @@ const text = {
     shippingFee: "送料",
     grandTotal: "お支払い合計",
     shipNote: "※ 配送料は別途計算されます。",
-    footer: "本ページは参考用のリストです。オンライン注文・決済は行っておりません。",
     copiedHint: "コピーしました。LINEのトークに貼り付けて送信してください。",
     shipToggle: "お届け先を入力",
     shipTitle: "お届け先情報",
@@ -346,7 +284,6 @@ const text = {
     shippingFee: "Shipping",
     grandTotal: "Grand total",
     shipNote: "Shipping fee will be calculated separately.",
-    footer: "This page is for reference only. No online ordering or payment is processed here.",
     copiedHint: "Copied. Paste it into LINE chat and send.",
     shipToggle: "Enter shipping address",
     shipTitle: "Shipping details",
@@ -371,46 +308,46 @@ const text = {
   }
 };
 
+/* ========= state ========= */
 let cart = {}; // code -> qty
 
+/* ========= UI language ========= */
 function setLang(l){
   lang = l;
+  setText("title", text[l].title);
+  setText("desc", text[l].desc);
+  setText("cartTitle", text[l].cart);
 
-  document.getElementById("title").innerText = text[l].title;
-  document.getElementById("desc").innerText = text[l].desc;
-  document.getElementById("cartTitle").innerText = text[l].cart;
+  setText("couponLabel", text[l].couponLabel);
 
-  document.getElementById("couponLabel").innerText = text[l].couponLabel;
+  setText("subtotalLabel", text[l].subtotal);
+  setText("discountLabel", text[l].discount);
+  setText("totalLabel", text[l].totalGoods);
+  setText("shippingFeeLabel", text[l].shippingFee);
+  setText("grandTotalLabel", text[l].grandTotal);
 
-  document.getElementById("subtotalLabel").innerText = text[l].subtotal;
-  document.getElementById("discountLabel").innerText = text[l].discount;
-  document.getElementById("totalLabel").innerText = text[l].totalGoods;
-  document.getElementById("shippingFeeLabel").innerText = text[l].shippingFee;
-  document.getElementById("grandTotalLabel").innerText = text[l].grandTotal;
+  setText("shippingNote", text[l].shipNote);
 
-  document.getElementById("shippingNote").innerText = text[l].shipNote;
-  document.getElementById("footerText").innerText = text[l].footer;
+  setText("shipToggleBtn", text[l].shipToggle);
+  setText("shipTitle", text[l].shipTitle);
+  setText("shipHint", text[l].shipHint);
 
-  document.getElementById("shipToggleBtn").innerText = text[l].shipToggle;
-  document.getElementById("shipTitle").innerText = text[l].shipTitle;
-  document.getElementById("shipHint").innerText = text[l].shipHint;
+  setText("zipLabel", text[l].zipLabel);
+  setText("zipSearchBtn", text[l].zipSearch);
 
-  document.getElementById("zipLabel").innerText = text[l].zipLabel;
-  document.getElementById("zipSearchBtn").innerText = text[l].zipSearch;
+  setText("prefLabel", text[l].prefLabel);
+  setText("cityLabel", text[l].cityLabel);
+  setText("townLabel", text[l].townLabel);
+  setText("addr2Label", text[l].addr2Label);
 
-  document.getElementById("prefLabel").innerText = text[l].prefLabel;
-  document.getElementById("cityLabel").innerText = text[l].cityLabel;
-  document.getElementById("townLabel").innerText = text[l].townLabel;
-  document.getElementById("addr2Label").innerText = text[l].addr2Label;
+  setText("nameLabel", text[l].nameLabel);
+  setText("phoneLabel", text[l].phoneLabel);
+  setText("emailLabel", text[l].emailLabel);
 
-  document.getElementById("nameLabel").innerText = text[l].nameLabel;
-  document.getElementById("phoneLabel").innerText = text[l].phoneLabel;
-  document.getElementById("emailLabel").innerText = text[l].emailLabel;
+  setText("privacyNote", text[l].privacy);
 
-  document.getElementById("privacyNote").innerText = text[l].privacy;
-
-  document.getElementById("lineBtn").innerText = text[l].lineBtn;
-  document.getElementById("copyBtn").innerText = text[l].copyBtn;
+  setText("lineBtn", text[l].lineBtn);
+  setText("copyBtn", text[l].copyBtn);
 
   render();
   applyCoupon();
@@ -418,30 +355,28 @@ function setLang(l){
 }
 
 function toggleShippingForm(){
-  const form = document.getElementById("shippingForm");
-  const isOpen = form.style.display !== "none";
-  form.style.display = isOpen ? "none" : "block";
-  if (!isOpen) {
-    // focus zip for quick input
-    setTimeout(()=>document.getElementById("zip")?.focus(), 50);
-  }
+  const form = $("shippingForm");
+  const open = form.style.display !== "none";
+  form.style.display = open ? "none" : "block";
+  if (!open) setTimeout(()=>$("zip")?.focus(), 50);
 }
 
-// ---------- Render Products ----------
+/* ========= products render ========= */
 function render(){
-  const div = document.getElementById("products");
+  const div = $("products");
   div.innerHTML = "";
 
   products.forEach(p => {
     const qty = cart[p.code] ?? 0;
+    const pname = escapeHtml(p.name[lang === "jp" ? "ja" : "en"]);
 
     div.innerHTML += `
       <div class="product">
-        <img src="${p.img}" alt="${escapeHtml(p.name[lang==='jp'?'ja':'en'])}"
+        <img src="${p.img}" alt="${pname}"
              onerror="this.style.opacity=.2; this.alt='(no image)';">
         <div>
-          <strong>${p.no}. ${escapeHtml(p.name[lang==='jp'?'ja':'en'])}</strong><br>
-          <span style="opacity:.8;">¥${p.price.toLocaleString()}</span><br><br>
+          <strong>${p.no}. ${pname}</strong><br>
+          <span style="opacity:.8;">${yen(p.price)}</span><br><br>
 
           ${text[lang].qtyLabel}:
           <span class="qtyWrap">
@@ -460,131 +395,103 @@ function render(){
   renderCart();
 }
 
-function updateQty(code, val){
-  const n = Math.max(0, Math.min(20, parseInt(val || "0", 10)));
+function updateQty(code, v){
+  const n = clampInt(v, 0, 20);
   if (n === 0) delete cart[code];
   else cart[code] = n;
   renderCart();
 }
 
 function stepQty(code, delta){
-  const el = document.getElementById("qty_" + code);
+  const el = $("qty_" + code);
   if (!el) return;
-
-  const cur = parseInt(el.value || "0", 10) || 0;
-  const next = Math.max(0, Math.min(20, cur + delta));
-
+  const next = clampInt((parseInt(el.value || "0", 10) || 0) + delta, 0, 20);
   el.value = next;
   updateQty(code, next);
 }
 
-// ---------- Money ----------
+/* ========= totals ========= */
 function getSubtotal(){
   let subtotal = 0;
-  for (let c in cart){
+  for (const c in cart){
     const p = products.find(x => x.code === c);
-    if (!p) continue;
-    subtotal += p.price * cart[c];
+    if (p) subtotal += p.price * cart[c];
   }
   return subtotal;
 }
 
-function getTotalGoodsAfterCoupon(){
-  const subtotal = getSubtotal();
-  const v = document.getElementById("couponSelect")?.value || "NONE";
-  const rule = couponRules[v] || couponRules.NONE;
-
-  const percentOff = Math.round(subtotal * (1 - rule.rate));
-  const cappedOff = Math.min(percentOff, rule.maxOff);
-
-  return Math.max(0, subtotal - cappedOff);
+function getCouponRule(){
+  const v = $("couponSelect")?.value || "NONE";
+  return couponRules[v] || couponRules.NONE;
 }
 
-function getPrefValue(){
-  const el = document.getElementById("pref");
-  return el ? el.value : "";
+function getTotalGoodsAfterCoupon(){
+  const subtotal = getSubtotal();
+  const rule = getCouponRule();
+  const percentOff = Math.round(subtotal * (1 - rule.rate));
+  const cappedOff = Math.min(percentOff, rule.maxOff);
+  return Math.max(0, subtotal - cappedOff);
 }
 
 function getShippingFeeByPref(pref){
   const p = String(pref || "").trim();
-  if (!p) return null;
-
-  const FEES = [
-    { fee: 1500, prefs: ["北海道"] },
-    { fee: 1100, prefs: ["青森県","岩手県","宮城県","秋田県","山形県","福島県"] },
-    { fee: 1000, prefs: ["茨城県","栃木県","群馬県","埼玉県","千葉県","東京都","神奈川県","山梨県"] },
-    { fee: 1000, prefs: ["新潟県","長野県"] },
-    { fee: 1000, prefs: ["富山県","石川県","福井県"] },
-    { fee: 1000, prefs: ["岐阜県","静岡県","愛知県","三重県"] },
-    { fee: 1100, prefs: ["滋賀県","京都府","大阪府","兵庫県","奈良県","和歌山県"] },
-    { fee: 1200, prefs: ["鳥取県","島根県","岡山県","広島県","山口県"] },
-    { fee: 1200, prefs: ["徳島県","香川県","愛媛県","高知県"] },
-    { fee: 1500, prefs: ["福岡県","佐賀県","長崎県","熊本県","大分県","宮崎県","鹿児島県"] },
-    { fee: 1500, prefs: ["沖縄県","沖縄"] },
-  ];
-
-  for (const g of FEES){
-    if (g.prefs.includes(p)) return g.fee;
-  }
-  return null;
+  return p ? (shippingFeeMap[p] ?? null) : null;
 }
 
 function updateShippingAndGrandTotal(){
-  const goodsTotal = getTotalGoodsAfterCoupon();
-  const ship = getShippingFeeByPref(getPrefValue());
-
-  const shipTextEl = document.getElementById("shippingFeeText");
-  const grandEl = document.getElementById("grandTotalText");
+  const goods = getTotalGoodsAfterCoupon();
+  const ship = getShippingFeeByPref(val("pref"));
 
   if (ship == null){
-    shipTextEl.innerText = text[lang].showShipAfter;
-    grandEl.innerText = "—";
+    setText("shippingFeeText", text[lang].showShipAfter);
+    setText("grandTotalText", "—");
   } else {
-    shipTextEl.innerText = "¥" + ship.toLocaleString();
-    grandEl.innerText = "¥" + (goodsTotal + ship).toLocaleString();
+    setText("shippingFeeText", yen(ship));
+    setText("grandTotalText", yen(goods + ship));
   }
 }
 
-// ---------- Cart ----------
+/* ========= cart render ========= */
 function renderCart(){
-  const ul = document.getElementById("cartList");
+  const ul = $("cartList");
   ul.innerHTML = "";
 
   const items = [];
-  for (let c in cart){
+  for (const c in cart){
     const p = products.find(x => x.code === c);
     if (!p) continue;
-    const sub = p.price * cart[c];
-    items.push({ no: p.no, name: p.name[lang==='jp'?'ja':'en'], qty: cart[c], sub });
+    items.push({
+      no: p.no,
+      name: p.name[lang === "jp" ? "ja" : "en"],
+      qty: cart[c],
+      sub: p.price * cart[c]
+    });
   }
   items.sort((a,b)=>a.no-b.no);
 
   items.forEach(it => {
-    ul.innerHTML += `<li>${it.no}. ${escapeHtml(it.name)} × ${it.qty} = ¥${it.sub.toLocaleString()}</li>`;
+    ul.innerHTML += `<li>${it.no}. ${escapeHtml(it.name)} × ${it.qty} = ${yen(it.sub)}</li>`;
   });
 
   const subtotal = getSubtotal();
-  const totalGoods = getTotalGoodsAfterCoupon();
-  const discountAmt = Math.max(0, subtotal - totalGoods);
+  const goods = getTotalGoodsAfterCoupon();
+  const discount = Math.max(0, subtotal - goods);
 
-  document.getElementById("subtotalText").innerText = "¥" + subtotal.toLocaleString();
-  document.getElementById("discountText").innerText = "-¥" + discountAmt.toLocaleString();
-  document.getElementById("totalText").innerText = "¥" + totalGoods.toLocaleString();
+  setText("subtotalText", yen(subtotal));
+  setText("discountText", "-"+yen(discount));
+  setText("totalText", yen(goods));
 
   updateShippingAndGrandTotal();
 }
 
-// ---------- Coupon ----------
+/* ========= coupon ========= */
 function applyCoupon(){
-  const v = document.getElementById("couponSelect").value;
-  const rule = couponRules[v] || couponRules.NONE;
-  discountRate = rule.rate;
+  const rule = getCouponRule();
+  const note = rule.note[lang === "jp" ? "jp" : "en"];
+  const noteEl = $("welcomeNote");
 
-  const noteEl = document.getElementById("welcomeNote");
-  const msg = rule.note[lang === "jp" ? "jp" : "en"];
-
-  if (msg) {
-    noteEl.innerText = msg;
+  if (note) {
+    noteEl.innerText = note;
     noteEl.style.display = "block";
   } else {
     noteEl.innerText = "";
@@ -594,19 +501,18 @@ function applyCoupon(){
   renderCart();
 }
 
-// ---------- Zip Lookup (ZipCloud) ----------
+/* ========= zip lookup ========= */
 function normalizeZip(z){
   return String(z || "").replace(/[^\d]/g, "").slice(0, 7);
 }
 
 async function lookupZip(){
-  const zip = normalizeZip(document.getElementById("zip").value);
+  const zip = normalizeZip(val("zip"));
   if (zip.length !== 7){
     alert(lang === "jp" ? "郵便番号は7桁で入力してください。" : "Please enter a 7-digit postal code.");
     return;
   }
 
-  // ZipCloud API
   const url = "https://zipcloud.ibsnet.co.jp/api/search?zipcode=" + zip;
 
   try{
@@ -619,9 +525,9 @@ async function lookupZip(){
     }
 
     const r = data.results[0];
-    document.getElementById("pref").value = r.address1 || "";
-    document.getElementById("city").value = r.address2 || "";
-    document.getElementById("town").value = r.address3 || "";
+    $("pref").value = r.address1 || "";
+    $("city").value = r.address2 || "";
+    $("town").value = r.address3 || "";
 
     updateShippingAndGrandTotal();
   } catch(e){
@@ -631,19 +537,18 @@ async function lookupZip(){
   }
 }
 
-// Format zip input and auto-lookup when 7 digits
 document.addEventListener("input", (e) => {
-  if (e.target && e.target.id === "zip"){
+  if (e.target?.id === "zip"){
     const raw = normalizeZip(e.target.value);
     e.target.value = raw.length > 3 ? raw.slice(0,3) + "-" + raw.slice(3) : raw;
     if (raw.length === 7) lookupZip();
   }
-  if (e.target && e.target.id === "pref"){
+  if (e.target?.id === "pref"){
     updateShippingAndGrandTotal();
   }
 });
 
-// ---------- Validation ----------
+/* ========= validation ========= */
 function hasAnyItems(){
   return Object.keys(cart).length > 0;
 }
@@ -654,75 +559,56 @@ function validateForOrder(){
     return false;
   }
 
-  const pref = getPrefValue().trim();
+  const pref = val("pref");
   const ship = getShippingFeeByPref(pref);
   if (!pref || ship == null){
     alert(text[lang].missingPref);
-    document.getElementById("pref")?.focus();
+    $("pref")?.focus();
     return false;
   }
 
-  // Require customer info for ordering
-  const name = (document.getElementById("custName").value || "").trim();
-  const zip = normalizeZip(document.getElementById("zip").value);
-  const city = (document.getElementById("city").value || "").trim();
-  const town = (document.getElementById("town").value || "").trim();
-  const addr2 = (document.getElementById("addr2").value || "").trim();
-  const phone = (document.getElementById("phone").value || "").trim();
-  const email = (document.getElementById("email").value || "").trim();
+  const name = val("custName");
+  const zip = normalizeZip(val("zip"));
+  const city = val("city");
+  const town = val("town");
+  const addr2 = val("addr2");
+  const phone = val("phone");
+  const email = val("email");
 
+  // keep original strictness: require 7-digit zip + prefecture + (city or town or addr2)
   const hasAddress = zip.length === 7 && pref && (city || town || addr2);
 
   if (!name || !hasAddress || !phone || !email){
     alert(text[lang].missingCustomer);
-    // focus the first missing field
-    if (!name) document.getElementById("custName")?.focus();
-    else if (zip.length !== 7) document.getElementById("zip")?.focus();
-    else if (!pref) document.getElementById("pref")?.focus();
-    else if (!phone) document.getElementById("phone")?.focus();
-    else document.getElementById("email")?.focus();
+    if (!name) $("custName")?.focus();
+    else if (zip.length !== 7) $("zip")?.focus();
+    else if (!pref) $("pref")?.focus();
+    else if (!phone) $("phone")?.focus();
+    else $("email")?.focus();
     return false;
   }
 
   return true;
 }
 
-// ---------- LINE / Copy ----------
-async function goLine(){
-  // Ensure the shipping form is visible so users notice what to fill
-  const form = document.getElementById("shippingForm");
-  if (form.style.display === "none") form.style.display = "block";
+/* ========= message / line ========= */
+function buildAddressLine(){
+  const zip = val("zip");
+  const pref = val("pref");
+  const city = val("city");
+  const town = val("town");
+  const addr2 = val("addr2");
 
-  if (!validateForOrder()) return;
-
-  const msg = buildMessage();
-  await copyToClipboard(msg);
-
-  // Open OA chat + prefill message (user taps Send)
-  const url =
-    "https://line.me/R/oaMessage/" +
-    encodeURIComponent(LINE_OA_ID) +
-    "/?" +
-    encodeURIComponent(msg);
-
-  window.open(url, "_blank");
-  showCopiedHint();
-}
-
-async function copyOnly(){
-  const form = document.getElementById("shippingForm");
-  if (form.style.display === "none") form.style.display = "block";
-
-  if (!validateForOrder()) return;
-
-  const msg = buildMessage();
-  await copyToClipboard(msg);
-  showCopiedHint();
+  // FIX: add spacing between city/town for readability, without changing content meaning
+  const area = [pref, city, town].filter(Boolean).join(" ");
+  const rest = [addr2].filter(Boolean).join(" ");
+  const head = zip ? `〒${zip}` : "";
+  return [head, area, rest].filter(Boolean).join(" ").trim();
 }
 
 function buildMessage(){
   const items = [];
-  for (let c in cart){
+  for (const c in cart){
     const p = products.find(x => x.code === c);
     if (!p) continue;
     items.push({ no: p.no, name: p.name[lang==='jp'?'ja':'en'], qty: cart[c] });
@@ -731,44 +617,31 @@ function buildMessage(){
 
   const lines = [];
   lines.push(lang === "jp" ? "【ご注文内容】" : "[Order Request]");
-
   items.forEach(it => lines.push(`${it.no}. ${it.name} × ${it.qty}`));
 
-  const coupon = document.getElementById("couponSelect").value;
-  if (coupon !== "NONE") {
-    lines.push((lang==="jp" ? "クーポン: " : "Coupon: ") + coupon);
-  }
+  const coupon = $("couponSelect")?.value || "NONE";
+  if (coupon !== "NONE") lines.push((lang==="jp" ? "クーポン: " : "Coupon: ") + coupon);
 
   const subtotal = getSubtotal();
-  const totalGoods = getTotalGoodsAfterCoupon();
-  const discountAmt = Math.max(0, subtotal - totalGoods);
-  lines.push((lang==="jp" ? "小計: ¥" : "Subtotal: ¥") + subtotal.toLocaleString());
-  lines.push((lang==="jp" ? "割引: -¥" : "Discount: -¥") + discountAmt.toLocaleString());
-  lines.push((lang==="jp" ? "商品合計: ¥" : "Goods total: ¥") + totalGoods.toLocaleString());
+  const goods = getTotalGoodsAfterCoupon();
+  const discount = Math.max(0, subtotal - goods);
 
-  const pref = getPrefValue().trim();
-  const ship = getShippingFeeByPref(pref);
+  lines.push((lang==="jp" ? "小計: " : "Subtotal: ") + yen(subtotal));
+  lines.push((lang==="jp" ? "割引: -" : "Discount: -") + yen(discount));
+  lines.push((lang==="jp" ? "商品合計: " : "Goods total: ") + yen(goods));
+
+  const ship = getShippingFeeByPref(val("pref"));
   if (ship != null){
-    lines.push((lang==="jp" ? "送料: ¥" : "Shipping: ¥") + ship.toLocaleString());
-    lines.push((lang==="jp" ? "お支払い合計: ¥" : "Grand Total: ¥") + (totalGoods + ship).toLocaleString());
+    lines.push((lang==="jp" ? "送料: " : "Shipping: ") + yen(ship));
+    lines.push((lang==="jp" ? "お支払い合計: " : "Grand Total: ") + yen(goods + ship));
   }
-
-  // Customer info
-  const zip = (document.getElementById("zip").value || "").trim();
-  const city = (document.getElementById("city").value || "").trim();
-  const town = (document.getElementById("town").value || "").trim();
-  const addr2 = (document.getElementById("addr2").value || "").trim();
-  const name = (document.getElementById("custName").value || "").trim();
-  const phone = (document.getElementById("phone").value || "").trim();
-  const email = (document.getElementById("email").value || "").trim();
 
   lines.push("");
   lines.push(lang === "jp" ? "【お客様情報】" : "[Customer Info]");
-  lines.push((lang==="jp" ? "お名前: " : "Name: ") + name);
-  lines.push((lang==="jp" ? "ご住所: " : "Address: ") + `〒${zip} ${pref} ${city}${town} ${addr2}`.trim());
-  lines.push((lang==="jp" ? "電話番号: " : "Phone: ") + phone);
-  lines.push((lang==="jp" ? "メール: " : "Email: ") + email);
-
+  lines.push((lang==="jp" ? "お名前: " : "Name: ") + val("custName"));
+  lines.push((lang==="jp" ? "ご住所: " : "Address: ") + buildAddressLine());
+  lines.push((lang==="jp" ? "電話番号: " : "Phone: ") + val("phone"));
+  lines.push((lang==="jp" ? "メール: " : "Email: ") + val("email"));
   lines.push("");
   lines.push(lang === "jp" ? "※ 配送料は上記の送料にて計算済みです。" : "Shipping is included in the totals above.");
 
@@ -789,10 +662,37 @@ async function copyToClipboard(textValue){
 }
 
 function showCopiedHint(){
-  const el = document.getElementById("copyHint");
+  const el = $("copyHint");
   el.innerText = text[lang].copiedHint;
   el.style.display = "block";
   setTimeout(()=>{ el.style.display = "none"; }, 3000);
+}
+
+async function goLine(){
+  const form = $("shippingForm");
+  if (form.style.display === "none") form.style.display = "block";
+
+  if (!validateForOrder()) return;
+
+  const msg = buildMessage();
+  await copyToClipboard(msg);
+
+  // IMPORTANT: OA ID is NOT encoded here (more stable in practice)
+  const url = "https://line.me/R/oaMessage/" + LINE_OA_ID + "/?" + encodeURIComponent(msg);
+  window.location.href = url;
+
+  showCopiedHint();
+}
+
+async function copyOnly(){
+  const form = $("shippingForm");
+  if (form.style.display === "none") form.style.display = "block";
+
+  if (!validateForOrder()) return;
+
+  const msg = buildMessage();
+  await copyToClipboard(msg);
+  showCopiedHint();
 }
 
 function escapeHtml(s){
@@ -804,7 +704,7 @@ function escapeHtml(s){
     .replaceAll("'", "&#039;");
 }
 
-// Init
+/* init */
 setLang("jp");
 applyCoupon();
 </script>
