@@ -494,20 +494,9 @@ function renderCart(){
 
 /* ========= coupon ========= */
 function applyCoupon(){
-  const rule = getCouponRule();
-  const note = rule.note[lang === "jp" ? "jp" : "en"];
-  const noteEl = $("couponNote");
-
-  if (note) {
-    noteEl.innerText = note;
-    noteEl.style.display = "block";
-  } else {
-    noteEl.innerText = "";
-    noteEl.style.display = "none";
-  }
-
   renderCart();
 }
+
 
 /* ========= zip lookup ========= */
 function normalizeZip(z){
