@@ -88,10 +88,10 @@
     </select>
   </div>
 
-  <div class="note" id="welcomeNote">
-    ※初めてLINEでご注文のお客様は「WELCOME10」クーポン（10%OFF）をご選択ください。
-　　※2回目以降のご注文は「LINE05」クーポン（5%OFF）をご選択ください。
-  </div>
+  <!-- 고정 안내(언어 전환됨) -->
+  <div class="note" id="welcomeNote" style="white-space:pre-line;"></div>
+  <!-- 선택한 쿠폰 상세 설명(언어 전환됨) -->
+  <div class="note" id="couponNote" style="display:none;"></div>
 
   <div class="summary">
     <div><span id="subtotalLabel">小計</span>: <strong id="subtotalText">¥0</strong></div>
@@ -203,8 +203,8 @@ const couponRules = {
   WELCOME10: {
     rate: 0.90, maxOff: 5000,
     note: {
-      jp: "※ 初回購入の場合にご利用ください（10%OFF／最大割引¥5,000）",
-      en: "For first-time purchases (10% OFF / Max ¥5,000 discount)"
+      jp: "※ LINE初回ご注文限定（10%OFF／最大割引¥5,000）",
+      en: "For first-time LINE orders only (10% OFF / Max ¥5,000 discount)"
     }
   }
 };
@@ -274,7 +274,8 @@ const text = {
     showShipAfter: "住所入力後に表示",
     missingPref: "都道府県を入力してください（送料計算のため）。",
     missingCustomer: "ご注文のため、お名前・ご住所・お電話番号・メールアドレスをご入力ください。",
-    noItems: "商品が未選択です。数量を入力してください。"
+    noItems: "商品が未選択です。数量を入力してください。",
+    couponGuide: "※ 初めてLINEでご注文のお客様は「WELCOME10」クーポン（10%OFF／最大割引¥5,000）をご選択ください。\n※ 2回目以降のご注文は「LINE05」クーポン（5%OFF／最大割引¥5,000）をご選択ください。"
   },
   en: {
     title: "Order List",
@@ -307,7 +308,8 @@ const text = {
     showShipAfter: "Enter address to calculate",
     missingPref: "Please enter your prefecture (needed to calculate shipping).",
     missingCustomer: "Please enter your name, address, phone, and email to place an order.",
-    noItems: "No items selected. Please set quantities."
+    noItems: "No items selected. Please set quantities.",
+    couponGuide: "※ If this is your first order via LINE, please select the \"WELCOME10\" coupon (10% OFF / Max ¥5,000 discount).\n※ For second or subsequent orders, please select the \"LINE05\" coupon (5% OFF / Max ¥5,000 discount)."
   }
 };
 
@@ -322,6 +324,9 @@ function setLang(l){
   setText("cartTitle", text[l].cart);
 
   setText("couponLabel", text[l].couponLabel);
+
+  // 고정 안내(2줄) 갱신
+  setText("welcomeNote", text[l].couponGuide);
 
   setText("subtotalLabel", text[l].subtotal);
   setText("discountLabel", text[l].discount);
@@ -491,7 +496,7 @@ function renderCart(){
 function applyCoupon(){
   const rule = getCouponRule();
   const note = rule.note[lang === "jp" ? "jp" : "en"];
-  const noteEl = $("welcomeNote");
+  const noteEl = $("couponNote");
 
   if (note) {
     noteEl.innerText = note;
