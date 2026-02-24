@@ -394,7 +394,12 @@ function render(){
         <img src="${p.img}" alt="${pname}"
              onerror="this.style.opacity=.2; this.alt='(no image)';">
         <div>
-          <strong>${p.no}. ${pname}</strong><br>
+          <strong>
+            ${p.no}. ${pname}
+            ${p.soldOut ? `<span style="color:red; font-weight:700; margin-left:6px;">
+              ${p.soldOut[lang]}
+            </span>` : ""}
+          </strong><br>
           <span style="opacity:.8;">${yen(p.price)}</span><br><br>
 
           ${text[lang].qtyLabel}:
