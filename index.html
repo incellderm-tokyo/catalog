@@ -560,7 +560,6 @@ function render(){
                   id="qty_${p.code}"
                   type="number"
                   min="0"
-                  max="${maxQty}"
                   value="${qty}"
                 
                   oninput="updateQty('${p.code}', this.value)"
@@ -594,39 +593,24 @@ function updateQty(code, v){
   const maxQty = stock[code] ?? 0;
   let n = parseInt(v || 0);
 
-  if(isNaN(n)) n = 0;
-
   const msgEl = $("stockMsg_" + code);
 
-  clearTimeout(stockMsgTimer[code]);
-
-  // 1) 초과 처리
   if(n > maxQty){
     n = maxQty;
 
-    if(msgEl){
-      msgEl.innerText =
-        lang === "jp"
-        ? `在庫は残り ${maxQty}点です`
-        : `Only ${maxQty} left in stock`;
-    }
+    msgEl.innerText = `残り${maxQty}点`;
 
-    stockMsgTimer[code] = setTimeout(() => {
-      if(msgEl) msgEl.innerText = "";
-    }, 2500);
+    setTimeout(() => {
+      msgEl.innerText = "";
+    }, 2000);
 
   } else {
-    if(msgEl){
-      msgEl.innerText = "";
-    }
+    msgEl.innerText = "";
   }
 
-  if(n < 0) n = 0;
+  cart[code] = n > 0 ? n : undefined;
 
-  cart[code] = (maxQty <= 0 || n === 0) ? undefined : n;
-
-  const el = $("qty_" + code);
-  if(el) el.value = n;
+  $("qty_" + code).value = n;
 
   renderCart();
 }
