@@ -502,7 +502,19 @@ function render(){
           </span><br>
 
           ${badge}<br><br>
-
+          ${
+            maxQty > 0
+            ? `
+              <div style="font-size:12px; color:#666; margin-bottom:8px;">
+                ${
+                  lang === "jp"
+                  ? `残り ${maxQty}点`
+                  : `${maxQty} left`
+                }
+              </div>
+            `
+            : ``
+          }
           ${
             maxQty > 0
             ? `
@@ -517,13 +529,35 @@ function render(){
                   value="${qty}"
                 
                   oninput="
-                    if(parseInt(this.value || 0) > ${maxQty}){
-                      this.value = ${maxQty};
+                  let v = parseInt(this.value || 0);
+                
+                  if(v > ${maxQty}){
+                    v = ${maxQty};
+                
+                    const msg = document.getElementById('stockMsg_${p.code}');
+                    if(msg){
+                      msg.innerText = '${
+                        lang === "jp"
+                        ? `在庫は残り ${maxQty}点です`
+                        : `Only ${maxQty} left in stock`
+                      }';
                     }
-                    if(parseInt(this.value || 0) < 0){
-                      this.value = 0;
+                  } else {
+                
+                    const msg = document.getElementById('stockMsg_${p.code}');
+                    if(msg){
+                      msg.innerText = '';
                     }
-                  "
+                  }
+                
+                  if(v < 0){
+                    v = 0;
+                  }
+                
+                  this.value = v;
+                
+                  updateQty('${p.code}', v);
+                "
                 
                   onchange="updateQty('${p.code}', this.value)">
 
