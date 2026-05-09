@@ -564,32 +564,7 @@ function render(){
                   max="${maxQty}"
                   value="${qty}"
                 
-                  oninput="
-                  let v = parseInt(this.value || 0) || 0;
-                  const max = ${maxQty};
-                  const msg = document.getElementById('stockMsg_${p.code}');
-                  
-                  if(v > max){
-                    v = max;
-                  
-                    if(msg){
-                      msg.innerText = '${lang === "jp"
-                        ? "在庫は残り " + maxQty + "点です"
-                        : "Only " + maxQty + " left in stock"}';
-                    }
-                  }else{
-                    if(msg){
-                      msg.innerText = '';
-                    }
-                  }
-                  
-                  if(v < 0){
-                    v = 0;
-                  }
-                  
-                  this.value = v;
-                  updateQty('${p.code}', v);
-                  "
+                  oninput="updateQty('${p.code}', this.value)"
                 
                   onchange="updateQty('${p.code}', this.value)">
 
@@ -624,11 +599,10 @@ function updateQty(code, v){
 
   const msgEl = $("stockMsg_" + code);
 
-  // 기존 타이머 제거
   clearTimeout(stockMsgTimer[code]);
 
+  // 1) 초과 처리
   if(n > maxQty){
-
     n = maxQty;
 
     if(msgEl){
@@ -638,13 +612,11 @@ function updateQty(code, v){
         : `Only ${maxQty} left in stock`;
     }
 
-    // ✔ 2~3초 후 자동 삭제 (핵심 UX)
     stockMsgTimer[code] = setTimeout(() => {
       if(msgEl) msgEl.innerText = "";
     }, 2500);
 
   } else {
-
     if(msgEl){
       msgEl.innerText = "";
     }
@@ -652,11 +624,7 @@ function updateQty(code, v){
 
   if(n < 0) n = 0;
 
-  if(maxQty <= 0 || n === 0){
-    delete cart[code];
-  } else {
-    cart[code] = n;
-  }
+  cart[code] = (maxQty <= 0 || n === 0) ? undefined : n;
 
   const el = $("qty_" + code);
   if(el) el.value = n;
