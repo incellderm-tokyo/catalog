@@ -87,7 +87,32 @@
   background:#999;
   color:#fff;
 }
-  
+
+  .discountBox{
+  margin-top:12px;
+  margin-bottom:12px;
+  padding:14px;
+  border-radius:14px;
+  background:#f8f8f8;
+  border:1px solid #e7e7e7;
+  line-height:1.7;
+}
+
+.discountMain{
+  font-size:15px;
+  font-weight:700;
+}
+
+.discountSub{
+  margin-top:6px;
+  font-size:12px;
+  color:#666;
+}
+
+.discountHighlight{
+  color:#111;
+  font-weight:700;
+}
 </style>
 </head>
 <body>
@@ -110,8 +135,7 @@
     <span id="couponLabel">クーポン:</span>
     <select id="couponSelect" onchange="applyCoupon()">
       <option value="NONE">（選択しない）</option>
-      <option value="LINE05" selected>LINE05</option>
-      <option value="WELCOME10">WELCOME10</option>
+      <option value="LINEVIP" selected>LINE VIP DISCOUNT</option>
     </select>
   </div>
 
@@ -119,7 +143,7 @@
   <div class="note" id="welcomeNote" style="white-space:pre-line;"></div>
   <!-- 선택한 쿠폰 상세 설명(언어 전환됨) -->
   <!--div class="note" id="couponNote" style="display:none;"></div-->
-
+  <div id="discountStatus" class="discountBox"></div>
   <div class="summary">
     <div><span id="subtotalLabel">小計</span>: <strong id="subtotalText">¥0</strong></div>
     <div><span id="discountLabel">割引</span>: <strong id="discountText">-¥0</strong></div>
@@ -219,19 +243,23 @@ let lang = "jp";
 const LINE_OA_ID = "@886xhwox"; // your OA ID
 
 const couponRules = {
-  NONE: { rate: 1.00, maxOff: 0, note: { jp:"", en:"" } },
-  LINE05: {
-    rate: 0.95, maxOff: 5000,
-    note: {
-      jp: "※ LINEでのご注文時にご利用いただけます（5%OFF／最大割引¥5,000）",
-      en: "Available for orders placed via LINE (5% OFF / Max ¥5,000 discount)"
-    }
+  NONE: {
+    rate: 1.00,
+    maxOff: 0,
+    note: { jp:"", en:"" }
   },
-  WELCOME10: {
-    rate: 0.90, maxOff: 5000,
+
+  LINEVIP: {
+    rate: null, // 자동 계산
+    maxOff: 999999,
     note: {
-      jp: "※ LINE初回ご注文限定（10%OFF／最大割引¥5,000）",
-      en: "For first-time LINE orders only (10% OFF / Max ¥5,000 discount)"
+      jp:
+`✔ 全商品 10%割引
+✔ 合計3万円以上のご購入で 15%割引 にアップ！`,
+
+      en:
+`✔ 10% OFF on all products
+✔ Orders over ¥30,000 get upgraded to 15% OFF!`
     }
   }
 };
@@ -277,8 +305,9 @@ const products = [
   { no: 13, code:"13", name:{ en:"ICD CUSHION 23", ja:"クッションファンデー23号" }, price:7800, img:"images/13.jpg" },
   { no: 14, code:"14", name:{ en:"COLLAGEN 100 MELTING MASK", ja:"コラーゲン100 メルティングマスク" }, price:8900, img:"images/14.jpg" },
   { no: 15, code:"15", name:{ en:"RADIANSOME TONER", ja:"ラディアンソーム トナー" }, price:12900, img:"images/15.jpg" },
-  { no: 16, code:"17", name:{ en:"RADIANSOME CREAM", ja:"ラディアンソーム クリーム" }, price:16100, img:"images/17.jpg" },
-  { no: 17, code:"18", name:{ en:"BALANCING GEL CLEANSER", ja:"バランシングジェルクレンザー" }, price:4700, img:"images/18.jpg" }
+  { no: 16, code:"16", name:{ en:"RADIANSOME ESSENSE", ja:"ラディアンソーム エッセンス" }, price:16900, img:"images/16.jpg" },
+  { no: 17, code:"17", name:{ en:"RADIANSOME CREAM", ja:"ラディアンソーム クリーム" }, price:16100, img:"images/17.jpg" },
+  { no: 18, code:"18", name:{ en:"BALANCING GEL CLEANSER", ja:"バランシングジェルクレンザー" }, price:4700, img:"images/18.jpg" }
 ];
 const stock = {
   "01": 0,
@@ -504,17 +533,35 @@ function render(){
 }
 
 function updateQty(code, v){
-  const n = clampInt(v, 0, 20);
-  if (n === 0) delete cart[code];
-  else cart[code] = n;
+
+  const maxQty = stock[code] ?? 0;
+
+  const n = clampInt(v, 0, maxQty);
+
+  if (n === 0){
+    delete cart[code];
+  } else {
+    cart[code] = n;
+  }
+
   renderCart();
 }
 
 function stepQty(code, delta){
+
   const el = $("qty_" + code);
   if (!el) return;
-  const next = clampInt((parseInt(el.value || "0", 10) || 0) + delta, 0, 20);
+
+  const maxQty = stock[code] ?? 0;
+
+  const next = clampInt(
+    (parseInt(el.value || "0", 10) || 0) + delta,
+    0,
+    maxQty
+  );
+
   el.value = next;
+
   updateQty(code, next);
 }
 
@@ -534,11 +581,24 @@ function getCouponRule(){
 }
 
 function getTotalGoodsAfterCoupon(){
+
   const subtotal = getSubtotal();
-  const rule = getCouponRule();
-  const percentOff = Math.round(subtotal * (1 - rule.rate));
-  const cappedOff = Math.min(percentOff, rule.maxOff);
-  return Math.max(0, subtotal - cappedOff);
+
+  const coupon = $("couponSelect")?.value || "NONE";
+
+  // 쿠폰 없음
+  if(coupon === "NONE"){
+    return subtotal;
+  }
+
+  // 자동 할인 계산
+  let rate = 0.90; // 기본 10% 할인
+
+  if(subtotal >= 30000){
+    rate = 0.85; // 15% 할인
+  }
+
+  return Math.round(subtotal * rate);
 }
 
 function getShippingFeeByPref(pref){
@@ -590,13 +650,87 @@ function renderCart(){
   setText("totalText", yen(goods));
 
   updateShippingAndGrandTotal();
+  updateDiscountStatus();
 }
 
 /* ========= coupon ========= */
 function applyCoupon(){
+
+  const v = $("couponSelect").value;
+  const rule = couponRules[v];
+
+  const noteEl = $("welcomeNote");
+
+  if(rule?.note){
+    noteEl.innerText = rule.note[lang];
+    noteEl.style.display = "block";
+  } else {
+    noteEl.style.display = "none";
+  }
+
   renderCart();
 }
 
+  function updateDiscountStatus(){
+
+  const box = $("discountStatus");
+
+  const subtotal = getSubtotal();
+
+  const coupon = $("couponSelect")?.value || "NONE";
+
+  if(coupon === "NONE"){
+    box.style.display = "none";
+    return;
+  }
+
+  box.style.display = "block";
+
+  // 기본 10%
+  let rate = 10;
+
+  // 3만엔 이상이면 15%
+  if(subtotal >= 30000){
+    rate = 15;
+  }
+
+  const remain = 30000 - subtotal;
+
+  // 15% 달성 상태
+  if(rate === 15){
+
+    box.innerHTML = `
+      <div class="discountMain">
+        ✔ ${rate}% OFF ${lang==="jp" ? "適用中" : "Applied"}
+      </div>
+
+      <div class="discountSub">
+        ${lang==="jp"
+          ? "3万円以上のご購入で最大割引が適用されています。"
+          : "Maximum discount has been applied for orders over ¥30,000."}
+      </div>
+    `;
+
+  }
+
+  // 아직 10% 상태
+  else {
+
+    box.innerHTML = `
+      <div class="discountMain">
+        ✔ 10% OFF ${lang==="jp" ? "適用中" : "Applied"}
+      </div>
+
+      <div class="discountSub">
+        ${
+          lang==="jp"
+          ? `あと <span class="discountHighlight">${yen(remain)}</span> ご購入で 15%OFF にアップ`
+          : `Add <span class="discountHighlight">${yen(remain)}</span> more to upgrade to 15% OFF`
+        }
+      </div>
+    `;
+  }
+}
 
 /* ========= zip lookup ========= */
 function normalizeZip(z){
