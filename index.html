@@ -509,6 +509,16 @@ function render(){
                   min="0"
                   max="${maxQty}"
                   value="${qty}"
+                
+                  oninput="
+                    if(parseInt(this.value || 0) > ${maxQty}){
+                      this.value = ${maxQty};
+                    }
+                    if(parseInt(this.value || 0) < 0){
+                      this.value = 0;
+                    }
+                  "
+                
                   onchange="updateQty('${p.code}', this.value)">
 
                 <span class="stepper">
@@ -536,12 +546,31 @@ function updateQty(code, v){
 
   const maxQty = stock[code] ?? 0;
 
-  const n = clampInt(v, 0, maxQty);
+  let n = parseInt(v || 0);
 
-  if (n === 0){
+  if(isNaN(n)) n = 0;
+
+  // 재고 이상 입력 방지
+  if(n > maxQty){
+    n = maxQty;
+  }
+
+  // 음수 방지
+  if(n < 0){
+    n = 0;
+  }
+
+  // 재고 0이면 삭제
+  if(maxQty <= 0 || n === 0){
     delete cart[code];
   } else {
     cart[code] = n;
+  }
+
+  // input 값도 강제로 맞춤
+  const el = $("qty_" + code);
+  if(el){
+    el.value = n;
   }
 
   renderCart();
