@@ -113,6 +113,12 @@
   color:#111;
   font-weight:700;
 }
+  .stock-msg{
+  margin-top:6px;
+  font-size:12px;
+  color:#b26a00;
+  font-weight:600;
+}
 </style>
 </head>
 <body>
@@ -526,6 +532,7 @@ function render(){
                   <button type="button" onclick="stepQty('${p.code}', -1)">▼</button>
                 </span>
               </span>
+              <div id="stockMsg_${p.code}" class="stock-msg"></div>
             `
             : `
               <span style="font-size:12px; color:#888;">
@@ -551,8 +558,24 @@ function updateQty(code, v){
   if(isNaN(n)) n = 0;
 
   // 재고 이상 입력 방지
+  const msgEl = $("stockMsg_" + code);
+  
   if(n > maxQty){
+  
     n = maxQty;
+  
+    if(msgEl){
+      msgEl.innerText =
+        lang === "jp"
+        ? `在庫は残り ${maxQty}点です`
+        : `Only ${maxQty} left in stock`;
+    }
+  
+  }else{
+  
+    if(msgEl){
+      msgEl.innerText = "";
+    }
   }
 
   // 음수 방지
